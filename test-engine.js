@@ -1,0 +1,4 @@
+const assert=require('node:assert/strict');require('./engine.js');const {evaluate}=globalThis.DasiEngine;
+let a=evaluate({persona:'개인',status:'개인회생',income:200,repayment:130,needed:100,missed:'있음',housing:'월세',urgency:'오늘·내일'});assert(a.cards.some(c=>c.id==='rehab'));assert(a.warnings.some(x=>x.includes('65%')));assert(a.warnings.some(x=>x.includes('미납')));assert(a.warnings.some(x=>x.includes('즉시 지급')));
+let b=evaluate({persona:'법인 대표',status:'정상 상환',income:500,repayment:100,needed:0,housing:'자가'});assert(b.cards.some(c=>c.id==='business'));assert(b.warnings.some(x=>x.includes('개인보증')));
+let c=evaluate({persona:'개인',status:'정상 상환',income:0,repayment:0,needed:0,housing:'자가'});assert(c.cards.length>0);assert(c.cards.every(x=>x.sources.every(s=>s.url.startsWith('https://'))));console.log('PASS: 3 scenarios');
