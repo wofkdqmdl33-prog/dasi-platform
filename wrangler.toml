@@ -1,0 +1,11 @@
+name = "dasi-data-service"
+main = "worker.js"
+compatibility_date = "2026-10-22"
+
+[triggers]
+crons = ["0 1 * * *"]
+
+# Cloudflare KV namespace created separately, insert your actual ID:
+[[kv_namespaces]]
+binding = "DASI_KV"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
