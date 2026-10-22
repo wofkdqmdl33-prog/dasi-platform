@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS source_checks (id TEXT PRIMARY KEY, name TEXT NOT NULL, url TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL, checked_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS chat_messages (id TEXT PRIMARY KEY, alias TEXT NOT NULL, body TEXT NOT NULL, created_at INTEGER NOT NULL, expires_at INTEGER NOT NULL);
+CREATE INDEX IF NOT EXISTS idx_chat_expiry ON chat_messages(expires_at);
+CREATE TABLE IF NOT EXISTS usage_daily (day TEXT NOT NULL, event TEXT NOT NULL, category TEXT NOT NULL DEFAULT 'all', count INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(day,event,category));
+CREATE TABLE IF NOT EXISTS refresh_runs (id INTEGER PRIMARY KEY AUTOINCREMENT, checked_at TEXT NOT NULL, success_count INTEGER NOT NULL, total_count INTEGER NOT NULL, scope TEXT NOT NULL);
