@@ -1,62 +1,45 @@
-# 다시 — 금융 회복 상황 진단 MVP
-
-기존 블루·화이트 디자인과 메인 가이드·체험 채팅을 유지한 정적 웹 앱입니다. 5단계 상황 입력으로 공식 기관 상담 경로를 정리합니다. 타 서비스의 브랜드·콘텐츠를 복제하지 않습니다.
+# 다시 — 2단계 공식 제도 탐색 시제품
 
 ## 실행
 
-```sh
-python -m http.server 8000
-# http://localhost:8000 또는 http://localhost:8000/diagnosis.html
-node test-engine.js
-# 선택: Python playwright 및 Chromium 필요
-python tests/browser-regression.py
-```
+`python -m http.server 8000` 후 `/schemes.html` 접속. `node test-schemes.cjs`로 20개 테스트 실행.
 
-앱 실행에 npm, API 키, 백엔드는 필요하지 않습니다. 브라우저 테스트의 Chromium 경로(`/usr/bin/chromium`)는 환경에 맞게 변경할 수 있습니다.
+## 현재 제공
 
-## 구현
+- 8개 공식 자료 기반 제도·기관 탐색 레코드
+- 연소득, 연체일수, 사업 유형, 채무조정 상환 회차 등에 따른 **일부 기본 조건 탐색**
+- 우선 검토 / 확인 필요 / 제한 가능성 높음 분류
+- 제도별 출처 URL 및 자료 확인일
+- 검색·분류·반응형 UI, 브라우저 내 처리
 
-- `index.html`: 기존 메인과 체험 채팅. 가이드 키보드 열기, 모달 포커스 순환·Escape 닫기. 유형·상태·금액을 새 탭 진단으로 이어갑니다. 팝업 차단 시 직접 진단 링크를 제공합니다.
-- `diagnosis.html`, `diagnosis.js`: 유형 → 채무 → 금액 → 생활·사업 → 확인. 진행률, 이전/다음, 전체 요약·수정·초기화, 결과 인쇄/PDF. 개인/자영업자 소득 증빙, 직장인 근로 형태, 창업자 등록 상태, 사업자 사업 상태, 법인 대표 개인보증을 조건부로 묻습니다. 개인회생 미납은 별도 항목입니다.
-- `engine.js`: DOM·네트워크·저장소와 독립적인 순수 함수 `evaluate(input, {asOf})`, `validate(input)`, 링크 검사 `safeOfficialUrl`, 상담 경로 카탈로그. CommonJS와 브라우저 전역 `DasiEngine` 지원. `asOf`는 호출자가 지정한 기록용 값이며 검증일이 아닙니다.
-- 결과는 **우선 확인 / 추가 확인 필요 / 판단 불가 / 대안 / 다음 행동**으로 구분합니다. 추천 근거·확인 항목·제한 사유·공식 기관 링크·출처 상태를 표시합니다.
+## 중요한 한계
 
-금액은 **만원 단위 0~100,000,000 정수**만 허용합니다. 이는 입력 처리 한도이며 제도 지원 한도가 아닙니다. 빈 값·음수·소수·비정상 값은 임의 보정하지 않고 차단합니다. 총채무 0인데 월 상환액이 있으면 확인을 요청합니다. 슬라이더는 편의 범위이며 직접 입력은 처리 한도까지 가능합니다. 법인 대표는 개인 소득·개인 채무를 입력하며 법인 채무와 개인보증을 자동 합산하지 않습니다.
+- `우선 검토`는 **지원 대상 확정이 아님**. 확인되지 않은 제외요건이 남아 있음.
+- 2026-10-22 공식 페이지 확인 기준. 이후 변경될 수 있음.
+- 신용평점 하위 20%, 기존 불법사금융예방대출 이용 이력, 조세체납 등은 입력·검증이 추가로 필요.
+- 채무조정은 연체일수만으로 최종 판정 불가.
+- 새출발기금은 사업 영위 시기·부실 상태·대상 금융채무 등 확인 필요. 신규 대출 아님.
+- 생활·주거 지원은 공식 안내 디렉터리이며 개별 모집공고 자격 판정 미제공.
+- 2단계 시제품은 GitHub 최신 Codex 개선본에 직접 병합하지 않은 **독립 추가 모듈**입니다. 저장소에 `schemes.html`, `schemes.js`, `test-schemes.cjs`를 추가하면 기존 파일을 건드리지 않고 실행할 수 있습니다.
 
-## 공식 제도 DB 확장 구조
+## 자료 출처
 
-현재 `catalog`는 **기관 상담 디렉터리**이며 개별 지원제도 DB가 아닙니다. 모든 레코드는 `검증필요`, `criteria: null`, `verifiedAt: null`, `validUntil: null`입니다. 검증되지 않은 자격·금액·소득 기준을 생성하지 않습니다.
+- https://www.kinfa.or.kr/notificationPromotion/newsDetail.do?seq=29254
+- https://www.kinfa.or.kr/notificationPromotion/noticeDetail.do?seq=33654
+- https://www.kinfa.or.kr/financialProduct/policyMicrofinanceBenefits.do
+- https://www.newstartfund.or.kr/Contents/Findmatchprogram.do
+- https://www.newstartfund.or.kr/Contents/Prod.do
+- https://www.newstartfund.or.kr/Faq/List.do
+- https://www.kinfa.or.kr/financialLife/complexSupportDetail.do
+- https://www.myhome.go.kr
 
-| 필드 | 의미 |
-| --- | --- |
-| schemeId, recordType | 안정적인 ID. 현재 `directory:` 접두사, `agency-directory` 유형 |
-| officialName, agency, officialUrl | 공식 명칭, 주관기관, 공식 HTTPS URL |
-| target, exclusions | 대상·제외조건. 빈 제외조건은 제외가 없다는 뜻이 아닌 미검증 |
-| requiredEvidence | 필요 증빙 안내. 최신 구비서류는 기관 확인 필요 |
-| verifiedAt, validUntil | 검증일·유효일. 미검증은 null |
-| ruleVersion, status | 규칙 버전 `2.0.0`, `확인완료`/`검증필요` 상태 |
-| criteria, sourceNote | 검증 기준과 출처 메모. 현재 자격 기준 없음 |
+## 3단계 연결 모듈 (2026-10-22)
 
-향후 공식 원문·개정 이력·검증 담당자·검증일을 확보하고 유효기간을 확인한 제도 데이터만 별도 자격 규칙에 사용해야 합니다. 만료·누락·검증필요 데이터를 판단 불가로 처리하는 DB 어댑터와 테스트가 필요합니다. 현재 외부 DB 연결·자동 갱신·관리자 검증 화면·제도 자격 판정은 미구현입니다. 공식 URL은 기존 기관 주소를 승계했으며 최신 기준의 온라인 검증을 완료했다고 표시하지 않습니다.
+현재 GitHub 저장소의 최신 `diagnosis.js`, `diagnosis.html`을 기준으로 진단 완료 시 같은 페이지에 제도 카드가 표시되도록 하는 연결 모듈입니다.
 
-## 개인정보·보안·접근성
+1. ZIP의 `schemes.js`, `schemes.html`, `diagnosis-schemes.js`, `apply-integration.py`, `test-integration.cjs`를 저장소 루트에 복사합니다.
+2. 저장소 루트에서 `python apply-integration.py` 실행. **GitHub 웹 업로드만으로는 기존 diagnosis 파일의 자동 수정이 이루어지지 않습니다.** 실행 후 수정된 `diagnosis.js`, `diagnosis.html`도 GitHub에 반영해야 합니다.
+3. `node test-schemes.cjs`와 `node test-integration.cjs` 실행, 기존 `node test-engine.js`도 실행합니다.
+4. `diagnosis.html`에서 진단 완료 → 페이지 하단의 '내 상황과 연결된 지원제도' 확인.
 
-- 진단 입력은 브라우저 메모리에서만 처리합니다. 서버 전송, URL 쿼리·해시, localStorage/sessionStorage 저장을 사용하지 않습니다.
-- 메인 → 진단은 동일 출처 새 탭의 opener 메모리에서 허용한 초기값을 한 번 읽고 삭제한 뒤 opener를 해제합니다. 직접 접속·새로고침·초기화 시 기본값으로 돌아갑니다.
-- 표시 문자열은 HTML 이스케이프합니다. 결과 링크는 HTTPS와 정확한 공식 호스트를 검사하며 사용자정보·비표준 포트는 거부합니다. 외부 링크는 noopener/noreferrer를 사용합니다.
-- 오류의 aria-invalid·설명 연결, 질문 그룹·선택 상태, 단계·결과 포커스, 모바일 버튼·줄바꿈, 인쇄 스타일을 적용했습니다.
-- Google Fonts·Unsplash는 기존 디자인 자산 요청이며 진단 입력을 포함하지 않습니다. 자체 호스팅은 추후 검토 사항입니다. 공식 링크를 누르면 외부 사이트로 이동하며 PDF 파일은 사용자가 저장·관리합니다.
-- 체험 채팅은 브라우저 내부 시연입니다. 누적 방문자와 일일 증가량도 시연 수치로 표시합니다.
-
-## 테스트 결과 (2026-10-22)
-
-- `node test-engine.js`: **42개 PASS**. 금액 경계·빈 값·주입 문자열, 상태별 경로, 회생 미납, 법인 보증 3종, 고용·주거, 순수 함수 결정성, 메타데이터, 악성 링크 차단.
-- `python tests/browser-regression.py`: **PASS**. 실제 Chromium에서 390px·1280px의 유형 5종(10개 완주 흐름), 메인 입력 이어받기, 금액 오류, 미납·보증, 이전·수정, 동의, 결과 구분, 인쇄/PDF 생성, 새로고침 초기화, 가이드 키보드·Escape, 가로 넘침·런타임 오류 확인. 외부 자산 요청을 차단한 상태로 검증합니다.
-- ZIP 내부 6개 파일이 원본 루트 소스와 동일함을 확인했습니다. ZIP은 과거 스냅샷이며 최신 실행 소스는 루트 파일입니다.
-- 스크린리더 전문 검수·실기기·전체 브라우저 호환성과 외부 기관 응답 검증은 미완료입니다.
-
-## 원본 분석·남은 작업
-
-원본의 금액 임의 보정과 UI·엔진 검증 불일치, 개인보증 질문·출처 메타데이터·결과 그룹·인쇄 CSS·상세 테스트 누락을 개선했습니다. 메인 분석 버튼의 중복 핸들러는 단일 진단 진입으로 정리했습니다.
-
-정식 운영 전 개별 제도 DB 수집·검증·만료 처리, 법률/금융 검토, 약관·개인정보처리방침, 자산 자체 호스팅 검토, 접근성 전문 검수, 실제 상담·채팅 운영이 필요합니다. 금융상품 승인·지급·법률 결과를 보장하지 않습니다.
+개인정보 보호: 진단 객체는 CustomEvent를 통해 같은 브라우저 메모리에서만 전달하며 localStorage, sessionStorage, 쿠키, URL 쿼리, 서버로 저장·전송하지 않습니다. 진단의 월 세후 소득을 연 세전 소득으로 추정하지 않으며, 채무 상태만으로 연체일수를 임의 추정하지 않습니다. 이에 따라 대부분 결과는 '확인 필요'가 정상입니다.
